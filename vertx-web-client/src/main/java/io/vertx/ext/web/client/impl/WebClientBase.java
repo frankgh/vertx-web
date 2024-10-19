@@ -15,6 +15,7 @@
  */
 package io.vertx.ext.web.client.impl;
 
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.VertxException;
@@ -27,6 +28,7 @@ import io.vertx.core.internal.http.HttpClientInternal;
 import io.vertx.core.internal.ContextInternal;
 import io.vertx.core.net.Address;
 import io.vertx.core.net.ProxyOptions;
+import io.vertx.core.net.SSLOptions;
 import io.vertx.core.net.SocketAddress;
 import io.vertx.ext.web.client.HttpRequest;
 import io.vertx.ext.web.client.WebClientOptions;
@@ -163,6 +165,11 @@ public class WebClientBase implements WebClientInternal {
   public <T> HttpContext<T> createContext(ContextInternal context) {
     HttpClientInternal client = (HttpClientInternal) this.client;
     return new HttpContext<>(context, client, options, interceptors, context.promise());
+  }
+
+  @Override
+  public Future<Boolean> updateSSLOptions(SSLOptions options, boolean force) {
+    return client.updateSSLOptions(options, force);
   }
 
   @Override

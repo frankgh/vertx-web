@@ -27,8 +27,6 @@ import io.vertx.ext.web.codec.BodyCodec;
 import io.vertx.ext.web.multipart.MultipartForm;
 import io.vertx.test.core.Repeat;
 import io.vertx.test.core.TestUtils;
-import io.vertx.test.fakeresolver.FakeAddress;
-import io.vertx.test.fakeresolver.FakeEndpointResolver;
 import io.vertx.test.tls.Cert;
 import org.junit.Test;
 
@@ -2162,5 +2160,35 @@ public class WebClientTest extends WebClientTestBase {
     testRequest(
       client -> client.request(HttpMethod.GET, new RequestOptions().setServer(new FakeAddress("mars"))),
       req -> assertEquals("localhost:8080", req.authority().toString()));
+  }
+
+  @Test
+  public void testUpdateSSLOptionsProxiesInternalClient() {
+    InterceptingHttpClass proxy = new InterceptingHttpClass((VertxInternal) vertx, new HttpClientOptions(), new PoolOptions(), new CloseFuture());
+    WebClient webClient = WebClient.wrap(proxy);
+    webClient.updateSSLOptions(new SSLOptions(), false);
+    assertEquals(1, proxy.proxiedCallsToUpdateSSLOptions.get());
+    webClient.updateSSLOptions(new SSLOptions(), true);
+    assertEquals(2, proxy.proxiedCallsToUpdateSSLOptions.get());
+    webClient.updateSSLOptions(new SSLOptions());
+    assertEquals(3, proxy.proxiedCallsToUpdateSSLOptions.get());
+    webClient.updateSSLOptions(new SSLOptions(), event -> {});
+    assertEquals(4, proxy.proxiedCallsToUpdateSSLOptions.get());
+    webClient.updateSSLOptions(new SSLOptions(), true, event -> {});
+    assertEquals(5, proxy.proxiedCallsToUpdateSSLOptions.get());
+  }
+
+  // Intercepts calls to updateSSLOptions and keeps track of the number of calls made to the method.
+  static class InterceptingHttpClass extends HttpClientImpl {
+    AtomicInteger proxiedCallsToUpdateSSLOptions = new AtomicInteger(0);
+    public InterceptingHttpClass(VertxInternal vertx, HttpClientOptions options, PoolOptions poolOptions, CloseFuture closeFuture) {
+      super(vertx, options, poolOptions, closeFuture);
+    }
+
+    @Override
+    public Future<Boolean> updateSSLOptions(SSLOptions options, boolean force) {
+      proxiedCallsToUpdateSSLOptions.incrementAndGet();
+      return Future.succeededFuture(true);
+    }
   }
 }
