@@ -27,6 +27,8 @@ import io.vertx.ext.web.codec.BodyCodec;
 import io.vertx.ext.web.multipart.MultipartForm;
 import io.vertx.test.core.Repeat;
 import io.vertx.test.core.TestUtils;
+import io.vertx.test.fakeresolver.FakeAddress;
+import io.vertx.test.fakeresolver.FakeEndpointResolver;
 import io.vertx.test.tls.Cert;
 import org.junit.Test;
 
