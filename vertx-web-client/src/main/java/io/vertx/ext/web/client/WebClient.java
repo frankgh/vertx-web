@@ -16,9 +16,7 @@
 package io.vertx.ext.web.client;
 
 import io.vertx.codegen.annotations.VertxGen;
-import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
-import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpClient;
@@ -791,20 +789,6 @@ public interface WebClient {
   }
 
   /**
-   * Like {@link #updateSSLOptions(SSLOptions)}  but supplying a handler that will be called when the update
-   * happened (or has failed).
-   *
-   * @param options the new SSL options
-   * @param handler the update handler
-   */
-  default void updateSSLOptions(SSLOptions options, Handler<AsyncResult<Boolean>> handler) {
-    Future<Boolean> fut = updateSSLOptions(options);
-    if (handler != null) {
-      fut.onComplete(handler);
-    }
-  }
-
-  /**
    * <p>Update the client with new SSL {@code options}, the update happens if the options object is valid and different
    * from the existing options object.
    *
@@ -819,21 +803,6 @@ public interface WebClient {
    * @return a future signaling the update success
    */
   Future<Boolean> updateSSLOptions(SSLOptions options, boolean force);
-
-  /**
-   * Like {@link #updateSSLOptions(SSLOptions)}  but supplying a handler that will be called when the update
-   * happened (or has failed).
-   *
-   * @param options the new SSL options
-   * @param force force the update when options are equals
-   * @param handler the update handler
-   */
-  default void updateSSLOptions(SSLOptions options, boolean force, Handler<AsyncResult<Boolean>> handler) {
-    Future<Boolean> fut = updateSSLOptions(options, force);
-    if (handler != null) {
-      fut.onComplete(handler);
-    }
-  }
 
   /**
    * Close the client. Closing will close down any pooled connections.
